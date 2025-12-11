@@ -1,6 +1,7 @@
 package com.Test.BookMyShowApplication.service;
 
 import com.Test.BookMyShowApplication.Exceptions.ExistingUserException;
+import com.Test.BookMyShowApplication.Exceptions.InvalidCredentialsException;
 import com.Test.BookMyShowApplication.models.User;
 import com.Test.BookMyShowApplication.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ public class UserService {
     UserRepository userRepository;
 
 
+    /// user for signup
     public User signup(String name, String email, String password) throws ExistingUserException {
 
         // We check if a user exists or not
@@ -42,17 +44,18 @@ public class UserService {
 
 
     /// use login page
-    public User login(String email, String password) {
+    public User login(String email, String password) throws InvalidCredentialsException {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
         User user = userOpt.get();
+
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
         return user;
